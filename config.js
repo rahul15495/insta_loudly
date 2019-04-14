@@ -3,5 +3,7 @@ module.exports.config= {
 
     "password": "raipur",
 
-    "cookiePath" : __dirname + '/cookies/test.json'
+    "cookiePath" : __dirname + '/cookies/test.json',
+
+    "maxNumPost" : 15
 }

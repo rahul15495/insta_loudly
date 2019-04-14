@@ -1,15 +1,16 @@
-var Client = require('instagram-private-api').V1;
+const Client = require('instagram-private-api').V1;
+const underscore = require('lodash');
 
-const config = require('../config.js').config ;
+const config = require('../config.js').config;
 
 var device = new Client.Device('rahul');
 var storage = new Client.CookieFileStorage(config.cookiePath);
 
 
-var feed, accountId;
 
+let accountId;
 var userMetaData = [];
-var posts = [];
+var numPosts =0
 
 // And go for login
 module.exports.getProfileData = (userHandle) => {
@@ -23,40 +24,70 @@ module.exports.getProfileData = (userHandle) => {
 
             accountId = account._params.id;
 
-            feed = new Client.Feed.UserMedia(session, accountId);
+            var feed = new Client.Feed.UserMedia(session, accountId);
 
-            return Promise.resolve(1);
+            return getPosts(feed);
+
+        })
+        .then(posts => {
+
+            return Promise.resolve({
+                "userMetaData": userMetaData,
+                "posts": posts
+            });
+        })
+
+
+}
+
+let getPosts = (feed) => {
+
+    var posts = []
+
+    return feed.get()
+        .then(setPost)
+        .then(_posts => {
+
+            posts.push(_posts);
 
         })
         .then(_ => {
-            return Promise.resolve(feed.get())
-        })
-        .then((result) => {
-                // posts.push(result._params)
 
-                // console.log(`feed.isMoreAvailable() : ${feed.isMoreAvailable()}`);
+            while (feed.isMoreAvailable() && numPosts < config.maxNumPost) {
 
-                feed = result.map(each => {
+                feed.get()
+                    .then(_posts => {
 
-                    x = each._params;
+                        posts.push(_posts);
 
-                    return {
-                        'takenAt': x.takenAt,
-                        'commentCount': x.commentCount,
-                        'caption': x.caption,
-                        'likeCount': x.likeCount,
-                        'webLink': x.webLink,
+                    })
+            }
 
-                        'images': x.images.map((each) => {
-                            return each.url;
-                        }),
-                    } ;
-                });
+            return Promise.all(underscore.flatten(posts));
+        });
 
+}
 
-                return Promise.resolve(feed);
-            }) ;
+let setPost = (result) => {
 
-            
-            
-        }
+    return result.map(each => {
+        
+        numPosts ++ ;
+
+        x = each._params;
+
+        return {
+            'id': x.id,
+            'takenAt': x.takenAt,
+            'commentCount': x.commentCount,
+            'caption': x.caption,
+            'likeCount': x.likeCount,
+            'webLink': x.webLink,
+
+            'images': x.images.map((each) => {
+                return each.url;
+            }),
+        };
+    });
+
+}
