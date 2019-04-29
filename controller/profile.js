@@ -47,7 +47,7 @@ const getInfo = (user) => {
     return out
 }
 
-const getFeedData= (feed) =>{
+const getFeedData= (feed, follwers) =>{
     let out= []
 
     total_posts= feed.count;
@@ -55,16 +55,21 @@ const getFeedData= (feed) =>{
     posts= feed.edges.map(post=>{
         post= post.node;
 
+        let likes= post.edge_liked_by.count;
+        let comments= post.edge_media_to_comment.count;
+        let engagement_rate= (likes+comments)/follwers
+
         return {
             id: post.id,
             caption: post.edge_media_to_caption.edges[0].node.text,
             shortcode: post.shortcode,
-            comments: post.edge_media_to_comment.count,
+            comments: comments,
             taken_at_timestamp: feed.taken_at_timestamp,
-            likes: post.edge_liked_by.count,
+            likes: likes,
             location: post.location,
             img: post.thumbnail_src,
-            mentions: getMentions(post.edge_media_to_caption.edges[0].node.text)
+            mentions: getMentions(post.edge_media_to_caption.edges[0].node.text),
+            engagement_rate: engagement_rate.toFixed(3)
         }
     }) ;
 
@@ -94,7 +99,10 @@ module.exports.getProfileData = async (userHandle) => {
 
     let personalInfo = getInfo(data.entry_data.ProfilePage[0].graphql.user)
 
-    let postData = getFeedData(data.entry_data.ProfilePage[0].graphql.user.edge_owner_to_timeline_media)
+    let postData = getFeedData(data.entry_data.ProfilePage[0].graphql.user.edge_owner_to_timeline_media, personalInfo.edge_followed_by)
 
-    return postData;
+    return {
+        info : personalInfo,
+        feed : postData
+    };
 }
