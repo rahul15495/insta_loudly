@@ -18,6 +18,8 @@ app.get('/profile/:id', (req, res) => {
             });
         })
         .catch(err=>{
+            console.error(err);
+            
             res.json({
                 status: false,
                 error: "incorrect username"
