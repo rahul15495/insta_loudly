@@ -1,8 +1,9 @@
 const axios = require('axios');
-const cheerio = require('cheerio');
-const FEED =require('./feed')
+const jp = require('jsonpath');
+const parser = require("shift-parser");
+const FEED = require('./feed')
 
-const BASE_URL= 'https://www.instagram.com'
+const BASE_URL = 'https://www.instagram.com'
 
 var requiredPersonalData = ['biography',
     'external_url',
@@ -52,7 +53,7 @@ module.exports.getProfileData = async (userHandle) => {
 
     let response;
 
-    let queryId ;
+    let queryId;
 
     try {
 
@@ -64,16 +65,16 @@ module.exports.getProfileData = async (userHandle) => {
             },
         });
 
-    } catch (err){
+    } catch (err) {
         console.log(err)
         throw err;
     }
 
     await getQueryid(userHandle, response)
-        .then(r=>{
-            queryId =r ;
+        .then(r => {
+            queryId = r;
         });
-    
+
     const data = JSON.parse(response.data.match(/<script type="text\/javascript">window._sharedData = (.*);<\/script>/)[1]) || {};
 
     let personalInfo = getInfo(data.entry_data.ProfilePage[0].graphql.user)
@@ -86,9 +87,9 @@ module.exports.getProfileData = async (userHandle) => {
     };
 }
 
-const getQueryid = async ( userHandle, _response) =>{
+const getQueryid = async (userHandle, _response) => {
 
-    let query_id_link= `${BASE_URL}${_response.data.match('/static/bundles/metro/ProfilePageContainer(.*).js')[0]}`
+    let query_id_link = `${BASE_URL}${_response.data.match('/static/bundles/metro/ProfilePageContainer(.*).js')[0]}`
 
     let response;
 
@@ -102,11 +103,25 @@ const getQueryid = async ( userHandle, _response) =>{
             },
         });
 
-    } catch (err){
+    } catch (err) {
         console.log(err)
         throw err;
     }
 
-    return eval(response.data.match('queryId:(.*?),')[1])
+    let jsFiles = parser.parseScript(response.data);
+
+    let query_ids =[]
+
+    jsFiles.statements.forEach(data => {
+
+        jp.query(data, '$..properties[?(@.name.value=="queryId")]')
+            .forEach(each => {
+            query_ids.push(each.expression.value) ;
+        })
+    })
+
+    console.log(query_ids)
+
+    return query_ids[2]
 
 }

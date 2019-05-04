@@ -48,8 +48,7 @@ const feedProcessor = (feed, follwers, userId, query_hash, end_cursor) => {
 
     generateLink(userId, query_hash, end_cursor)
         .then(r => {
-            console.log(r.statusCode)
-            console.log(r.responseUrl)
+            console.log(r)
         })
 
     return allPosts;
@@ -84,22 +83,20 @@ const generateLink = async (id, query_hash, after, first = 12) => {
 
     try {
 
-        // response = await axios({
-        //     method: 'get',
-        //     url: `${BASE_URL}/graphql/query/`,
-        //     headers: {
-        //         Referer: `${BASE_URL}/priyankachopra/`,
-        //     }
-        // });
-
-        Promise.resolve(url)
+        response = await axios({
+            method: 'get',
+            url: url,
+            headers: {
+                Referer: `${BASE_URL}/priyankachopra/`,
+            }
+        });
 
 
     } catch (err) {
-        console.log(err)
+        console.error(err)
         // throw err;
     }
 
-    return {}
+    return response
 
 }
