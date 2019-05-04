@@ -9,7 +9,8 @@
     "express": "^4.16.4",
     "instagram-private-api": "^0.10.1",
     "lodash": "^4.17.11",
-    "php-transpiler": "^0.4.0"
+    "php-transpiler": "^0.4.0",
+    "querystring": "^0.2.0"
   },
   "devDependencies": {},
   "scripts": {
