@@ -85,7 +85,7 @@ module.exports.getProfileData = async(Session) => {
 
     Session.userId = personalInfo.id
 
-    let postData = FEED.getFeedData(Session, data, personalInfo.edge_followed_by)
+    let postData = await FEED.getFeedData(Session, data, personalInfo.edge_followed_by)
 
     return {
         info: personalInfo,
@@ -131,7 +131,7 @@ const getQueryid = async(Session) => {
 
     })
 
-    console.log(query_ids)
+    //console.log(query_ids)
 
     return query_ids[2]
 
