@@ -1,4 +1,3 @@
-const axios = require('axios');
 const jp = require('jsonpath');
 const parser = require("shift-parser");
 const FEED = require('./feed')
@@ -32,7 +31,7 @@ const getInfo = (user) => {
             value = user[key[0]]
         } else {
 
-            let temp = user
+            let temp = user;
             key.forEach(k => {
                 temp = temp[k]
             })
@@ -49,7 +48,7 @@ const getInfo = (user) => {
     return out
 }
 
-module.exports.getProfileData = async (userHandle) => {
+module.exports.getProfileData = async(Session) => {
 
     let response;
 
@@ -57,29 +56,36 @@ module.exports.getProfileData = async (userHandle) => {
 
     try {
 
-        response = await axios({
-            method: 'get',
-            url: `${BASE_URL}/${userHandle}/`,
-            headers: {
-                Referer: `${BASE_URL}/${userHandle}/`,
-            },
-        });
+        response = await Session._client.get(`/${Session._userHandle}/`)
+
+        console.log(response.status)
+
+        Session.cookie = response.headers['set-cookie']
+
+        Session.referer = response.config.url
+
+        Session._query_id_link = `${response.data.match('/static/bundles/es6/ProfilePageContainer(.*).js')[0]}`
+
+
+        console.log(Session._query_id_link)
 
     } catch (err) {
         console.log(err)
         throw err;
     }
 
-    await getQueryid(userHandle, response)
+    await getQueryid(Session)
         .then(r => {
-            queryId = r;
+            Session.query_id = r;
         });
 
     const data = JSON.parse(response.data.match(/<script type="text\/javascript">window._sharedData = (.*);<\/script>/)[1]) || {};
 
     let personalInfo = getInfo(data.entry_data.ProfilePage[0].graphql.user)
 
-    let postData = FEED.getFeedData(queryId ,data, personalInfo.edge_followed_by,personalInfo.id)
+    Session.userId = personalInfo.id
+
+    let postData = FEED.getFeedData(Session, data, personalInfo.edge_followed_by)
 
     return {
         info: personalInfo,
@@ -87,37 +93,42 @@ module.exports.getProfileData = async (userHandle) => {
     };
 }
 
-const getQueryid = async (userHandle, _response) => {
-
-    let query_id_link = `${BASE_URL}${_response.data.match('/static/bundles/metro/ProfilePageContainer(.*).js')[0]}`
+const getQueryid = async(Session) => {
 
     let response;
 
     try {
 
-        response = await axios({
-            method: 'get',
-            url: query_id_link,
-            headers: {
-                Referer: `${BASE_URL}/${userHandle}/`,
-            },
-        });
+        response = await Session._client.get(Session._query_id_link)
 
     } catch (err) {
         console.log(err)
         throw err;
     }
 
-    let jsFiles = parser.parseScript(response.data);
+    let jsFiles = response.data.split('\n');
 
-    let query_ids =[]
+    let query_ids = [];
 
-    jsFiles.statements.forEach(data => {
+    jsFiles.forEach(temp => {
 
-        jp.query(data, '$..properties[?(@.name.value=="queryId")]')
-            .forEach(each => {
-            query_ids.push(each.expression.value) ;
-        })
+        try {
+
+            parser.parseScript(temp).statements.forEach(data => {
+                jp.query(data, '$..properties[?(@.name.value=="queryId")]')
+                    .forEach(each => {
+                        query_ids.push(each.expression.value);
+                    })
+            })
+
+        } catch (err) {
+            matches = temp.match('queryId:"(.*)",')
+            if (matches) {
+                query_ids.push(matches[1])
+            }
+
+        }
+
     })
 
     console.log(query_ids)

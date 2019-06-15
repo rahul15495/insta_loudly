@@ -4,7 +4,7 @@ var querystring = require('querystring');
 const BASE_URL = 'https://www.instagram.com'
 
 
-module.exports.getFeedData = (queryId, data, follwers, userId) => {
+module.exports.getFeedData = (Session, data, follwers) => {
 
     let feed = data.entry_data.ProfilePage[0].graphql.user.edge_owner_to_timeline_media;
     let out = []
@@ -13,7 +13,7 @@ module.exports.getFeedData = (queryId, data, follwers, userId) => {
     has_next_page = feed.page_info.has_next_page;
     end_cursor = feed.page_info.end_cursor;
 
-    posts = feedProcessor(feed, follwers, userId, queryId, end_cursor);
+    posts = feedProcessor(feed, follwers, Session, end_cursor);
 
     return {
         total_posts: total_posts,
@@ -21,7 +21,7 @@ module.exports.getFeedData = (queryId, data, follwers, userId) => {
     }
 }
 
-const feedProcessor = (feed, follwers, userId, query_hash, end_cursor) => {
+const feedProcessor = (feed, follwers, Session, end_cursor) => {
 
     allPosts = feed.edges.map(post => {
         post = post.node;
@@ -46,9 +46,9 @@ const feedProcessor = (feed, follwers, userId, query_hash, end_cursor) => {
 
     let after = allPosts[allPosts.length - 1].id;
 
-    generateLink(userId, query_hash, end_cursor)
+    generateLink(Session, end_cursor)
         .then(r => {
-            console.log(r)
+            console.log(r.status)
         })
 
     return allPosts;
@@ -61,21 +61,21 @@ const getMentions = caption => {
     return caption.match(pattern);
 }
 
-const generateLink = async (id, query_hash, after, first = 12) => {
+const generateLink = async(Session, after, first = 12) => {
 
     let variables = {
-        "id": id,
+        "id": Session._userId,
         "first": first,
         "after": after
     }
     let response;
 
-    params= querystring.stringify({
-        query_hash: query_hash,
+    params = querystring.stringify({
+        query_hash: Session._query_id,
         variables: JSON.stringify(variables)
     });
 
-    url= `${BASE_URL}/graphql/query/?${params}`
+    url = `/graphql/query/?${params}`
 
 
     console.log(url)
@@ -83,18 +83,13 @@ const generateLink = async (id, query_hash, after, first = 12) => {
 
     try {
 
-        response = await axios({
-            method: 'get',
-            url: url,
-            headers: {
-                Referer: `${BASE_URL}/priyankachopra/`,
-            }
-        });
+        response = await Session._client.get(url)
 
 
     } catch (err) {
-        console.error(err)
+        // console.error(err)
         // throw err;
+        {}
     }
 
     return response

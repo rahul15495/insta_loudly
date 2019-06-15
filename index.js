@@ -1,25 +1,33 @@
 const express = require("express"),
-    http = require("http");
+    http = require("http"),
+    cookieParser = require('cookie-parser'),
+    session = require('./core/session');
 
 const profile = require('./controller/profile');
 
 
 let app = express();
 
+app.use(cookieParser())
+
 const port = 8000;
 
 app.get('/profile/:id', (req, res) => {
 
-    profile.getProfileData(req.params.id)
+    let userHandle = req.params.id;
+
+    var Session = new session.Session(userHandle);
+
+    profile.getProfileData(Session)
         .then(o => {
             res.json({
                 status: true,
                 data: o
             });
         })
-        .catch(err=>{
+        .catch(err => {
             console.error(err);
-            
+
             res.json({
                 status: false,
                 error: "incorrect username"
