@@ -21,7 +21,7 @@ module.exports.getFeedData = async(Session, data, follwers) => {
         link = generateLink(Session, end_cursor)
 
         try {
-            // console.log(link)
+            //console.log(link)
             response = await Session._client.get(link)
 
             if (response.status == 200) {
@@ -47,6 +47,8 @@ module.exports.getFeedData = async(Session, data, follwers) => {
 
         } catch (err) {
             console.error(err)
+
+            //console.log(JSON.stringify(feed))
             break;
         }
     }
@@ -73,16 +75,24 @@ const feedProcessor = (feed, follwers, allPosts = []) => {
         let comments = post.edge_media_to_comment.count;
         let engagement_rate = (likes + comments) / follwers
 
+        let caption;
+
+        try {
+            caption = post.edge_media_to_caption.edges[0].node.text;
+        } catch (err) {
+            caption = ''
+        }
+
         return {
             id: post.id,
-            caption: post.edge_media_to_caption.edges[0].node.text,
+            caption: caption,
             shortcode: post.shortcode,
             comments: comments,
             taken_at_timestamp: feed.taken_at_timestamp,
             likes: likes,
             location: post.location,
             img: post.thumbnail_src,
-            mentions: getMentions(post.edge_media_to_caption.edges[0].node.text),
+            mentions: getMentions(caption),
             engagement_rate: engagement_rate.toFixed(3)
         }
     });

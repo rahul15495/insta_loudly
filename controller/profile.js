@@ -58,7 +58,7 @@ module.exports.getProfileData = async(Session) => {
 
         response = await Session._client.get(`/${Session._userHandle}/`)
 
-        console.log(response.status)
+        //console.log(response.status)
 
         Session.cookie = response.headers['set-cookie']
 
@@ -67,7 +67,7 @@ module.exports.getProfileData = async(Session) => {
         Session._query_id_link = `${response.data.match('/static/bundles/es6/ProfilePageContainer(.*).js')[0]}`
 
 
-        console.log(Session._query_id_link)
+        //console.log(Session._query_id_link)
 
     } catch (err) {
         console.log(err)
