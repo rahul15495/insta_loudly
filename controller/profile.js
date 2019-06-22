@@ -48,21 +48,30 @@ const getInfo = (user) => {
     return out
 }
 
+module.exports.visitProfile = async(Session) => {
+    let response;
+
+    response = await Session._client.get(`/${Session._userHandle}/`)
+
+    //console.log(response.status)
+
+    Session.cookie = response.headers['set-cookie']
+
+    Session.referer = response.config.url
+
+    return response;
+
+}
+
+
+
 module.exports.getProfileData = async(Session) => {
 
     let response;
 
-    let queryId;
-
     try {
 
-        response = await Session._client.get(`/${Session._userHandle}/`)
-
-        //console.log(response.status)
-
-        Session.cookie = response.headers['set-cookie']
-
-        Session.referer = response.config.url
+        response = await this.visitProfile(Session);
 
         Session._query_id_link = `${response.data.match('/static/bundles/es6/ProfilePageContainer(.*).js')[0]}`
 
@@ -134,5 +143,69 @@ const getQueryid = async(Session) => {
     //console.log(query_ids)
 
     return query_ids[2]
+
+}
+
+module.exports.extractFollowing = async(Session) => {
+    let response;
+
+    try {
+
+        response = await this.visitProfile(Session);
+
+        //console.log(response.data)
+
+        Session._following_query_id_link = `${response.data.match('/static/bundles/es6/Consumer.js(.*).js')[0]}`
+
+
+        //console.log(Session._following_query_id_link)
+
+        await getFollowingQueryid(Session);
+
+    } catch (err) {
+        console.log(err)
+        throw err;
+    }
+
+    return [];
+}
+
+const getFollowingQueryid = async(Session) => {
+
+    let response;
+
+    try {
+
+        response = await Session._client.get(Session._following_query_id_link)
+
+    } catch (err) {
+        console.log(err)
+        throw err;
+    }
+
+    //console.log(response.data)
+
+    //edge_follow
+
+    let jsFiles = response.data.split('\n');
+
+    let query_ids = [];
+
+    jsFiles.forEach(line => {
+        matches = line.match('FOLLOW_LIST_REQUEST_UPDATED,(.*)')
+        if (matches) {
+            parser.parseScript(line).statements.forEach(data => {
+                //$..declarators[?(@.binding.name=="n")].init.value
+                jp.query(data, '$..declarators[?(@.binding.name=="n")].init.value')
+                    .forEach(each => {
+                        query_ids.push(each);
+                    })
+
+            })
+        }
+    })
+
+    console.log(query_ids[0])
+
 
 }

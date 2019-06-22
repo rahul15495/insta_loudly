@@ -13,6 +13,8 @@ class Session {
         this._query_id_link = null;
         this._query_id = null;
         this._userId = null;
+        this._following_query_id = null;
+        this._following_query_id_link = null;
     }
 
     set cookie(newCookie) {
@@ -39,6 +41,14 @@ class Session {
 
     set userId(id) {
         this._userId = id;
+    }
+
+    set following_query_id(id) {
+        this._following_query_id = id;
+    }
+
+    set following_query_id_link(link) {
+        this._following_query_id_link = link;
     }
 
     setClientHeader(arg) {

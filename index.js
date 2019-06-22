@@ -35,6 +35,29 @@ app.get('/profile/:id', (req, res) => {
         })
 })
 
+app.get('/following/:id', (req, res) => {
+
+    let userHandle = req.params.id;
+
+    var Session = new session.Session(userHandle);
+
+    profile.extractFollowing(Session)
+        .then(o => {
+            res.json({
+                status: true,
+                data: o
+            });
+        })
+        .catch(err => {
+            console.error(err);
+
+            res.json({
+                status: false,
+                error: "incorrect username"
+            })
+        })
+})
+
 
 http.createServer(app).listen(port, () => {
     console.log(`server listening to ${port}`);
