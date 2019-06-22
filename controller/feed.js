@@ -1,4 +1,3 @@
-const axios = require('axios');
 var querystring = require('querystring');
 
 const BASE_URL = 'https://www.instagram.com'

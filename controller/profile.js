@@ -1,6 +1,7 @@
 const jp = require('jsonpath');
 const parser = require("shift-parser");
 const FEED = require('./feed')
+const FOLLOWING = require('./following')
 
 const BASE_URL = 'https://www.instagram.com'
 
@@ -160,7 +161,18 @@ module.exports.extractFollowing = async(Session) => {
 
         //console.log(Session._following_query_id_link)
 
-        await getFollowingQueryid(Session);
+        await getFollowingQueryid(Session)
+            .then(r => {
+                Session.following_query_id = r;
+            })
+
+        const data = JSON.parse(response.data.match(/<script type="text\/javascript">window._sharedData = (.*);<\/script>/)[1]) || {};
+
+        let personalInfo = getInfo(data.entry_data.ProfilePage[0].graphql.user)
+
+        Session.userId = personalInfo.id
+
+        FOLLOWING.getFollowing(Session);
 
     } catch (err) {
         console.log(err)
@@ -205,7 +217,7 @@ const getFollowingQueryid = async(Session) => {
         }
     })
 
-    console.log(query_ids[0])
+    return query_ids[0]
 
 
 }
