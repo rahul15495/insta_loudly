@@ -6,18 +6,25 @@ module.exports.getFollowing = async(Session) => {
 
     let link = generateLink(Session)
 
-    let response = await Session._client.get(link);
+    try {
 
-    console.log(JSON.stringify(response.data));
+        let response = await Session._client.get(link);
 
-    let feed = response.data.data.user.edge_follow;
+        console.log(JSON.stringify(response.data));
 
-    let total_following = feed.count;
-    let has_next_page = feed.page_info.has_next_page;
-    let end_cursor = feed.page_info.end_cursor;
+        let feed = response.data.data.user.edge_follow;
 
-    following = feedProcessor(feed, following);
-    console.log(following);
+        let total_following = feed.count;
+        let has_next_page = feed.page_info.has_next_page;
+        let end_cursor = feed.page_info.end_cursor;
+
+        following = feedProcessor(feed, following);
+        console.log(following);
+    } catch (err) {
+        console.log('boom')
+    }
+
+
 
 }
 

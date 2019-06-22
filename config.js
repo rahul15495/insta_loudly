@@ -1,9 +1,9 @@
-module.exports.config= {
-    "username": "sex.n.city",
+module.exports.config = {
+    "username": "rahul.8d@gmail.com",
 
-    "password": "raipur",
+    "password": "chaurasia15",
 
-    "cookiePath" : __dirname + '/cookies/test.json',
+    "cookiePath": __dirname + '/cookies/test.json',
 
-    "maxNumPost" : 15
+    "maxNumPost": 15
 }

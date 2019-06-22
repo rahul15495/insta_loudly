@@ -16,8 +16,9 @@ let client = axios.create({
         'Pragma': 'no-cache',
         'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36',
         'X-IG-App-ID': '936619743392459',
+        // 'X-Instagram-AJAX': 'e64c89747fb7',
 
     }
 })
 
-module.exports.client = client ;
+module.exports.client = client;

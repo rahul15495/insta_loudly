@@ -1,5 +1,6 @@
 const Client = require('../core/request');
-
+const CONFIG = require('../config').config;
+var querystring = require('querystring');
 
 class Session {
 
@@ -15,6 +16,7 @@ class Session {
         this._userId = null;
         this._following_query_id = null;
         this._following_query_id_link = null;
+        this._csrf = null;
     }
 
     set cookie(newCookie) {
@@ -50,6 +52,10 @@ class Session {
     set following_query_id_link(link) {
         this._following_query_id_link = link;
     }
+    set csrf(token) {
+        this._csrf = token;
+        this.setClientHeader('csrf');
+    }
 
     setClientHeader(arg) {
 
@@ -63,9 +69,55 @@ class Session {
                 this._client.defaults.headers['Referer'] = this._referer;
                 break;
 
+            case 'csrf':
+                this._client.defaults.headers['X-CSRFToken'] = this._csrf;
+
             default:
                 {}
         }
+
+    }
+    async login() {
+
+        try {
+
+            let res, res2;
+
+            let initial_link = 'https://www.instagram.com/accounts/login/?source=auth_switcher'
+
+            let LOGIN_URL = 'https://www.instagram.com/accounts/login/ajax/'
+
+            res = await this._client.get(initial_link)
+
+            this.cookie = res.headers['set-cookie']
+
+            let token = res.headers['set-cookie'][7].split(';')[0].replace('csrftoken=', '')
+
+            this.csrf = token;
+
+            let body = {
+                'username': 'rahul.8d@gmail.com',
+                'password': 'chaurasia15',
+                'queryParams': JSON.stringify({
+                    "source": "auth_switcher"
+                }),
+                'optIntoOneTap': true
+            }
+
+            res2 = await this._client.post(LOGIN_URL, querystring.stringify(body))
+
+            this.cookie = res2.headers['set-cookie']
+
+            if (res2.status == 200) {
+                console.log('login success')
+            } else {
+                throw 'UNSUCESSFULL LOGIN ATTEMPT'
+            }
+
+        } catch (err) {
+            console.error(err)
+        }
+
 
     }
 }
