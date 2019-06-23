@@ -12,6 +12,8 @@ app.use(cookieParser())
 
 const port = 8000;
 
+var FSession = new session.Session('');
+
 app.get('/profile/:id', (req, res) => {
 
     let userHandle = req.params.id;
@@ -39,11 +41,11 @@ app.get('/following/:id', (req, res) => {
 
     let userHandle = req.params.id;
 
-    var Session = new session.Session(userHandle);
+    FSession.userHandle = userHandle;
 
-    Session.login()
+    Promise.resolve()
         .then(_ => {
-            profile.extractFollowing(Session)
+            profile.extractFollowing(FSession)
                 .then(o => {
                     res.json({
                         status: true,
@@ -63,7 +65,8 @@ app.get('/following/:id', (req, res) => {
 
 })
 
-
-http.createServer(app).listen(port, () => {
-    console.log(`server listening to ${port}`);
-});
+FSession.login().then(_ => {
+    http.createServer(app).listen(port, () => {
+        console.log(`server listening to ${port}`);
+    });
+})

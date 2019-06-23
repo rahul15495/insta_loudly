@@ -181,9 +181,7 @@ module.exports.extractFollowing = async(Session) => {
 
     //console.log(out)
 
-    return {
-        'following': out
-    }
+    return out
 }
 
 const getFollowingQueryid = async(Session) => {

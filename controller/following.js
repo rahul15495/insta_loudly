@@ -8,6 +8,8 @@ module.exports.getFollowing = async(Session) => {
 
     let initial_link = `/${Session._userHandle}/followers/`
 
+    let total_following = 0;
+
     try {
 
         Session.referer = Session._baseUrl + initial_link
@@ -22,16 +24,41 @@ module.exports.getFollowing = async(Session) => {
 
         let feed = response.data.data.user.edge_follow;
 
-        let total_following = feed.count;
+        total_following = feed.count;
         let has_next_page = feed.page_info.has_next_page;
         let end_cursor = feed.page_info.end_cursor;
 
         following = feedProcessor(feed, following);
+
+        while (has_next_page && following.length < 100) {
+
+            link = generateLink(Session, end_cursor);
+
+            console.log(link)
+
+            response = await Session._client.get(link);
+
+
+            feed = response.data.data.user.edge_follow;
+
+            total_following = feed.count;
+            has_next_page = feed.page_info.has_next_page;
+            end_cursor = feed.page_info.end_cursor;
+
+            following = feedProcessor(feed, following);
+
+        }
+
+
     } catch (err) {
         console.log(err)
     }
 
-    return following
+    return {
+        'total_following': total_following,
+        'total_extracted': following.length,
+        'following': following
+    }
 }
 
 const feedProcessor = (feed, allFollowing) => {

@@ -19,6 +19,10 @@ class Session {
         this._csrf = null;
     }
 
+    set userHandle(name) {
+        this._userHandle = name;
+    }
+
     set cookie(newCookie) {
         this._cookie = newCookie;
         this.setClientHeader('cookie');
@@ -95,9 +99,11 @@ class Session {
 
             this.csrf = token;
 
+            //console.log(CONFIG)
+
             let body = {
-                'username': 'rahul.8d@gmail.com',
-                'password': 'chaurasia15',
+                'username': CONFIG.username,
+                'password': CONFIG.password,
                 'queryParams': JSON.stringify({
                     "source": "auth_switcher"
                 }),
