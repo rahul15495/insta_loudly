@@ -41,7 +41,7 @@ app.get('/following/:id', (req, res) => {
 
     var Session = new session.Session(userHandle);
 
-    Promise.resolve()
+    Session.login()
         .then(_ => {
             profile.extractFollowing(Session)
                 .then(o => {

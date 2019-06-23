@@ -6,11 +6,19 @@ module.exports.getFollowing = async(Session) => {
 
     let link = generateLink(Session)
 
+    let initial_link = `/${Session._userHandle}/followers/`
+
     try {
+
+        Session.referer = Session._baseUrl + initial_link
+
+        //console.log(Session._referer)
+
+        // console.log(Session._client.defaults)
 
         let response = await Session._client.get(link);
 
-        console.log(JSON.stringify(response.data));
+        // console.log(JSON.stringify(response.data));
 
         let feed = response.data.data.user.edge_follow;
 
@@ -19,13 +27,11 @@ module.exports.getFollowing = async(Session) => {
         let end_cursor = feed.page_info.end_cursor;
 
         following = feedProcessor(feed, following);
-        console.log(following);
     } catch (err) {
-        console.log('boom')
+        console.log(err)
     }
 
-
-
+    return following
 }
 
 const feedProcessor = (feed, allFollowing) => {
@@ -38,7 +44,7 @@ const feedProcessor = (feed, allFollowing) => {
             _following.push({
                 'id': node.id,
                 'username': node.username,
-                'node': full_name
+                'full_name': node.full_name
             })
         }
     })
@@ -66,7 +72,7 @@ const generateLink = (Session, after = null, first = 24) => {
         variables = {
             "id": Session._userId,
             "include_reel": true,
-            "fetch_mutual": false,
+            "fetch_mutual": true,
             "first": first,
         }
     }
@@ -77,9 +83,6 @@ const generateLink = (Session, after = null, first = 24) => {
     });
 
     url = `${Session._baseUrl}/graphql/query/?${params}`
-
-
-    console.log(url);
 
     return url
 

@@ -37,28 +37,29 @@ Session._client.post(LOGIN_URL, querystring.stringify(body)).then(r => {
 
 Session.cookie = res2.headers['set-cookie']
 
+csrf = res2.headers['set-cookie'][7].split(';')[0].replace('csrftoken=', '')
+
+Session.csrf = csrf;
+
+console.log(res2.headers)
+console.log(Object.keys(res2))
+console.log(res2.data)
+
+
 /*
-set-cookie: sessionid=""; Domain=instagram.com; expires=Thu, 01-Jan-1970 00:00:00 GMT; Max-Age=0; Path=/
-set-cookie: sessionid=""; Domain=.instagram.com; expires=Thu, 01-Jan-1970 00:00:00 GMT; Max-Age=0; Path=/
-set-cookie: sessionid=""; Domain=i.instagram.com; expires=Thu, 01-Jan-1970 00:00:00 GMT; Max-Age=0; Path=/
-set-cookie: sessionid=""; Domain=.i.instagram.com; expires=Thu, 01-Jan-1970 00:00:00 GMT; Max-Age=0; Path=/
-set-cookie: sessionid=""; Domain=www.instagram.com; expires=Thu, 01-Jan-1970 00:00:00 GMT; Max-Age=0; Path=/
-set-cookie: sessionid=""; Domain=.www.instagram.com; expires=Thu, 01-Jan-1970 00:00:00 GMT; Max-Age=0; Path=/
-set-cookie: sessionid=""; expires=Thu, 01-Jan-1970 00:00:00 GMT; Max-Age=0; Path=/
-set-cookie: csrftoken=n3jDNkcjdG1lhG1oLb785N8UbfZNDuep; Domain=.instagram.com; expires=Sat, 20-Jun-2020 18:11:40 GMT; Max-Age=31449600; Path=/; Secure
-set-cookie: rur=PRN; Domain=.instagram.com; HttpOnly; Path=/; Secure
-status: 200
-strict-transport-security: max-age=31536000
-vary: Cookie, Accept-Language, Accept-Encoding
-x-aed: 1
-x-content-type-options: nosniff
-x-fb-trip-id: 1679558926
-x-frame-options: SAMEORIGIN
-x-xss-protection: 0
-
-
-
-
-X-Instagram-AJAX: e64c89747fb7
-
-*/
+[ 'target=""; Domain=instagram.com; expires=Thu, 01-Jan-1970 00:00:00 GMT; Max-Age=0; Path=/',
+  'target=""; Domain=.instagram.com; expires=Thu, 01-Jan-1970 00:00:00 GMT; Max-Age=0; Path=/',
+  'target=""; Domain=i.instagram.com; expires=Thu, 01-Jan-1970 00:00:00 GMT; Max-Age=0; Path=/',
+  'target=""; Domain=.i.instagram.com; expires=Thu, 01-Jan-1970 00:00:00 GMT; Max-Age=0; Path=/',
+  'target=""; Domain=www.instagram.com; expires=Thu, 01-Jan-1970 00:00:00 GMT; Max-Age=0; Path=/',
+  'target=""; Domain=.www.instagram.com; expires=Thu, 01-Jan-1970 00:00:00 GMT; Max-Age=0; Path=/',
+  'target=""; expires=Thu, 01-Jan-1970 00:00:00 GMT; Max-Age=0; Path=/',
+  'csrftoken=sA2HQ5X5nLxKetSzdybw34ovATcH2q37; Domain=.instagram.com; expires=Sun, 21-Jun-2020 10:30:08 GMT; Max-Age=31449600; Path=/; Secure',
+  'shbid=3199; Domain=.instagram.com; expires=Sun, 30-Jun-2019 10:30:08 GMT; HttpOnly; Max-Age=604800; Path=/; Secure',
+  'shbts=1561285808.099859; Domain=.instagram.com; expires=Sun, 30-Jun-2019 10:30:08 GMT; HttpOnly; Max-Age=604800; Path=/; Secure',
+  'rur=ATN; Domain=.instagram.com; HttpOnly; Path=/; Secure',
+  'mid=XQ9UrwAEAAHNKGh0KlKpK6DvqXmz; Domain=.instagram.com; expires=Wed, 20-Jun-2029 10:30:08 GMT; Max-Age=315360000; Path=/; Secure',
+  'ds_user_id=1259032718; Domain=.instagram.com; expires=Sat, 21-Sep-2019 10:30:08 GMT; Max-Age=7776000; Path=/; Secure',
+  'sessionid=1259032718%3AueUoUANY7T9fzA%3A8; Domain=.instagram.com; expires=Mon, 22-Jun-2020 10:30:08 GMT; HttpOnly; Max-Age=31536000; Path=/; Secure',
+  '__to_be_deleted__instagram.com=""; Domain=instagram.com; expires=Thu, 01-Jan-1970 00:00:00 GMT; Max-Age=0; Path=/' ]
+  */

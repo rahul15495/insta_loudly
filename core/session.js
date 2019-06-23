@@ -106,7 +106,6 @@ class Session {
 
             res2 = await this._client.post(LOGIN_URL, querystring.stringify(body))
 
-            this.cookie = res2.headers['set-cookie']
 
             if (res2.status == 200) {
                 console.log('login success')
@@ -114,12 +113,28 @@ class Session {
                 throw 'UNSUCESSFULL LOGIN ATTEMPT'
             }
 
+
+            let _cookie = ''
+
+            range(7, 7).forEach(index => {
+                let a = res2.headers['set-cookie'][index]
+
+                a = a.split(';')[0].split('=')
+                _cookie = _cookie + `${a[0]}=${a[1]}; `
+            })
+
+            this.cookie = _cookie
+
         } catch (err) {
             console.error(err)
         }
 
 
     }
+}
+
+function range(size, startAt = 0) {
+    return [...Array(size).keys()].map(i => i + startAt);
 }
 
 module.exports.Session = Session;

@@ -18,7 +18,13 @@ let client = axios.create({
         'X-IG-App-ID': '936619743392459',
         // 'X-Instagram-AJAX': 'e64c89747fb7',
 
-    }
+    },
+    xsrfCookieName: 'csrftoken',
+    xsrfHeaderName: 'X-CSRFToken',
+    withCredentials: true
+
+
+
 })
 
 module.exports.client = client;

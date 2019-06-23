@@ -56,7 +56,7 @@ module.exports.visitProfile = async(Session) => {
 
     //console.log(response.status)
 
-    Session.cookie = response.headers['set-cookie']
+    //Session.cookie = response.headers['set-cookie']
 
     Session.referer = response.config.url
 
@@ -149,7 +149,7 @@ const getQueryid = async(Session) => {
 
 module.exports.extractFollowing = async(Session) => {
     let response;
-
+    var out
     try {
 
         response = await this.visitProfile(Session);
@@ -172,14 +172,18 @@ module.exports.extractFollowing = async(Session) => {
 
         Session.userId = personalInfo.id
 
-        FOLLOWING.getFollowing(Session);
+        out = await FOLLOWING.getFollowing(Session);
 
     } catch (err) {
         console.log(err)
         throw err;
     }
 
-    return [];
+    //console.log(out)
+
+    return {
+        'following': out
+    }
 }
 
 const getFollowingQueryid = async(Session) => {
