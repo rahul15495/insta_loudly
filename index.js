@@ -16,21 +16,21 @@ const port = 8000;
 var FSession = new session.Session('');
 
 
-app.use(morgan(
-    ':remote-addr :method :url HTTP/:http-version :status :res[content-length] - :response-time ms', {
-        skip: function(req, res) {
-            return res.statusCode < 400
-        },
-        stream: process.stderr
-    }));
+// app.use(morgan(
+//     ':remote-addr :method :url HTTP/:http-version :status :res[content-length] - :response-time ms', {
+//         skip: function(req, res) {
+//             return res.statusCode < 400
+//         },
+//         stream: process.stderr
+//     }));
 
-app.use(morgan(
-    ':remote-add :method :url HTTP/:http-version :status :res[content-length] - :response-time ms', {
-        skip: function(req, res) {
-            return res.statusCode >= 400
-        },
-        stream: process.stdout
-    }));
+// app.use(morgan(
+//     ':remote-add :method :url HTTP/:http-version :status :res[content-length] - :response-time ms', {
+//         skip: function(req, res) {
+//             return res.statusCode >= 400
+//         },
+//         stream: process.stdout
+//     }));
 
 
 app.get('/profile/:id', (req, res) => {

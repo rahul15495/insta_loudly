@@ -51,7 +51,7 @@ module.exports.getFollowing = async(Session) => {
 
 
     } catch (err) {
-        console.log(err)
+        console.log(err.response.data)
     }
 
     return {

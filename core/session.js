@@ -123,17 +123,7 @@ class Session {
                 throw 'UNSUCESSFULL LOGIN ATTEMPT'
             }
 
-
-            let _cookie = ''
-
-            range(7, 7).forEach(index => {
-                let a = res2.headers['set-cookie'][index]
-
-                a = a.split(';')[0].split('=')
-                _cookie = _cookie + `${a[0]}=${a[1]}; `
-            })
-
-            this.cookie = _cookie
+            this.setCookie(res2)
 
         } catch (error) {
 
@@ -142,7 +132,7 @@ class Session {
                     console.log("challenge required")
                     this._challenge.checkpoint_url = error.response.data.checkpoint_url;
 
-                    await challenge();
+                    await this.challenge();
                     console.log("login success after challenge");
                 } else {
                     throw error;
@@ -166,24 +156,44 @@ class Session {
             console.log("sending choice as sms");
         }
 
-        await Session._client.post(checkpoint_url, querystring.stringify({
+        let res2 = await this._client.post(checkpoint_url, querystring.stringify({
             'choice': CONFIG.challenge_choice
         }))
 
         console.log('message sent');
 
+        this.setCookie(res2, 1, 0)
+        this.setCookie(res2, 1, 2)
+
         let securityCode = await inquirer.prompt([{
             type: 'input',
             name: 'code',
             message: 'Enter code',
-        }]).code;
+        }]);
 
-        console.log(`Security Code Entered: ${securityCode}`)
+        await console.log(`Security Code Entered: ${securityCode.code}`)
 
-        await Session._client.post(checkpoint_url, querystring.stringify({
-            'security_code': securityCode
+        let res = await this._client.post(checkpoint_url, querystring.stringify({
+            'security_code': securityCode.code
         }));
 
+        this.setCookie(res, 1, 7);
+
+        return
+
+    }
+
+    setCookie(res2, size = 7, startAt = 7) {
+
+        let _cookie = ''
+
+        range(size, startAt).forEach(index => {
+            let a = res2.headers['set-cookie'][index]
+            a = a.split(';')[0].split('=')
+            _cookie = _cookie + `${a[0]}=${a[1]}; `
+        })
+
+        this.cookie = _cookie
     }
 }
 

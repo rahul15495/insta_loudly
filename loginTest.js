@@ -63,3 +63,28 @@ console.log(res2.data)
   'sessionid=1259032718%3AueUoUANY7T9fzA%3A8; Domain=.instagram.com; expires=Mon, 22-Jun-2020 10:30:08 GMT; HttpOnly; Max-Age=31536000; Path=/; Secure',
   '__to_be_deleted__instagram.com=""; Domain=instagram.com; expires=Thu, 01-Jan-1970 00:00:00 GMT; Max-Age=0; Path=/' ]
   */
+
+/*
+session = require('./core/session');
+var Session = new session.Session('priyankachopra');
+
+Session.login().then(_=>{console.log('yay')});
+*/
+
+/*
+ig_cb=1; rur=FRC; csrftoken=yA6L60mFhyqAZ6la2GaxkxN8C96xxy6T; mid=XRt9qwAEAAHyK68XpBkrrTrRD3qx; urlgen="{\"46.101.57.114\": 14061}:1hiL55:C6E26vCUYZkymmakvtVy1lfIl3A"
+
+*/
+/*
+csrftoken=yA6L60mFhyqAZ6la2GaxkxN8C96xxy6T; Domain=.instagram.com; expires=Tue, 30-Jun-2020 15:54:19 GMT; Max-Age=31449600; Path=/; Secure
+*/
+
+let test = async() => {
+    out = await inquirer.prompt([{
+        type: 'input',
+        name: 'code',
+        message: 'Enter code',
+    }])
+
+    console.log(out);
+}
