@@ -178,6 +178,8 @@ class Session {
             message: 'Enter code',
         }]).code;
 
+        console.log(`Security Code Entered: ${securityCode}`)
+
         await Session._client.post(checkpoint_url, querystring.stringify({
             'security_code': securityCode
         }));
