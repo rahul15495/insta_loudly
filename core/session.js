@@ -139,11 +139,11 @@ class Session {
 
             try {
                 if (error.response.data.message == 'checkpoint_required') {
-                    console.log('challenge required')
+                    console.log("challenge required")
                     this._challenge.checkpoint_url = error.response.data.checkpoint_url;
 
                     await challenge();
-                    console.log('login success after challenge');
+                    console.log("login success after challenge");
                 } else {
                     throw error;
                 }
@@ -161,9 +161,9 @@ class Session {
 
 
         if (CONFIG.challenge_choice == 1) {
-            console.log('sending choice as email');
+            console.log("sending choice as email");
         } else {
-            console.log('sending choice as sms');
+            console.log("sending choice as sms");
         }
 
         await Session._client.post(checkpoint_url, querystring.stringify({
