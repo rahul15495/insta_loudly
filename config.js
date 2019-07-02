@@ -5,5 +5,7 @@ module.exports.config = {
 
     "cookiePath": __dirname + '/cookies/test.json',
 
-    "maxNumPost": 15
+    "maxNumPost": 15,
+
+    'challenge_choice': 1
 }

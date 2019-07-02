@@ -10,6 +10,7 @@
     "cookie-parser": "^1.4.4",
     "esprima": "^4.0.1",
     "express": "^4.16.4",
+    "inquirer": "^6.4.1",
     "instagram-private-api": "^0.10.1",
     "jsonpath": "^1.0.1",
     "loadash": "^1.0.0",

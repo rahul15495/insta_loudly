@@ -1,6 +1,7 @@
 const Client = require('../core/request');
 const CONFIG = require('../config').config;
 var querystring = require('querystring');
+var inquirer = require("inquirer")
 
 class Session {
 
@@ -17,6 +18,9 @@ class Session {
         this._following_query_id = null;
         this._following_query_id_link = null;
         this._csrf = null;
+        this._challenge = {
+            'status': false
+        };
     }
 
     set userHandle(name) {
@@ -131,10 +135,52 @@ class Session {
 
             this.cookie = _cookie
 
-        } catch (err) {
-            console.error(err)
+        } catch (error) {
+
+            try {
+                if (error.response.data.message == 'checkpoint_required') {
+                    console.log('challenge required')
+                    this._challenge.checkpoint_url = error.response.data.checkpoint_url;
+
+                    await challenge();
+                    console.log('login success after challenge');
+                } else {
+                    throw error;
+                }
+            } catch (error) {
+                console.error(error);
+            }
+
+
+        }
+    }
+
+    async challenge() {
+        let checkpoint_url = this._challenge.checkpoint_url;
+        Session.referer = checkpoint_url;
+
+
+        if (CONFIG.challenge_choice == 1) {
+            console.log('sending choice as email');
+        } else {
+            console.log('sending choice as sms');
         }
 
+        await Session._client.post(checkpoint_url, querystring.stringify({
+            'choice': CONFIG.challenge_choice
+        }))
+
+        console.log('message sent');
+
+        let securityCode = await inquirer.prompt([{
+            type: 'input',
+            name: 'code',
+            message: 'Enter code',
+        }]).code;
+
+        await Session._client.post(checkpoint_url, querystring.stringify({
+            'security_code': securityCode
+        }));
 
     }
 }
