@@ -1,7 +1,7 @@
 module.exports.config = {
-    "username": "rahul.8d@gmail.com",
+    "username": "",
 
-    "password": "chaurasia15",
+    "password": "",
 
     "cookiePath": __dirname + '/cookies/test.json',
 
