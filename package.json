@@ -13,7 +13,7 @@
     "instagram-private-api": "^0.10.1",
     "jsonpath": "^1.0.1",
     "loadash": "^1.0.0",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.21",
     "php-transpiler": "^0.4.0",
     "querystring": "^0.2.0",
     "shift-parser": "^6.0.1"
